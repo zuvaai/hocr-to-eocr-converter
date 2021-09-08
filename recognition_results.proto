@@ -1,0 +1,142 @@
+// Copyright 2021 Zuva Inc., Kira Inc./ Litera 
+// This data format is intended to record output of OCR processes for ingestion
+// into the Zuva Document AI.
+
+syntax = "proto3";
+
+package main;
+
+message Document {
+  // Required
+  // Must be set to the value 3.
+  int32 version = 1;
+  // Required
+  // This must be a linearized version of the document represented
+  // as characters. It should include the spaces between words
+  // and paragraphs as appropriate. Spaces should be represented
+  // with the unicode space character. Paragraphs only need a single
+  // space between them, they don't need special treatment.
+  repeated Character characters = 2;
+  // Required
+  repeated Page pages = 3;
+  // Optional
+  repeated Table tables = 4;
+  // Optional
+  repeated TableCell table_cells = 5;
+  // Optional
+  repeated Font fonts = 6;
+  // Optional
+  repeated FontSize font_sizes = 7;
+  // Optional
+  repeated FontStyle font_styles = 8;
+  // Optional
+  repeated Header headers = 9;
+  // Optional
+  repeated Footer footers = 10;
+  // Required
+  bytes md5 = 18;
+}
+
+message Character {
+  // The character as a UTF-16 decimal value. E.g. © is 169.
+  uint32 unicode = 1;
+  // An integer between 0 and 100 where 0 means full confidence and 100 no confidence.
+  uint32 error = 2;
+  // The character's bounding box on the page.
+  BoundingBox bounding_box = 3;
+}
+
+message Page {
+  // The range of characters the page covers.
+  CharacterRange range = 1;
+  // The width of the page in pixels.
+  uint32 width = 2;
+  // The height of the page in pixels.
+  uint32 height = 3;
+  // The number of horizontal pixels per inch.
+  uint32 dpi_x = 4;
+  // The number of vertical pixels per inch.
+  uint32 dpi_y = 5;
+}
+
+message Table {
+  // An arbitrary integer. Each table must have a unique integer identifier.
+  uint32 id = 1;
+  // The page number of the page the table is on, starting from 0.
+  uint32 page_number = 2;
+}
+
+message TableCell {
+  // The id of the table the cell is a part of, matches id in Table.
+  uint32 id = 1;
+  // The bounding box of the cell on the page.
+  BoundingBox bounding_box = 2;
+  // The color of the cell.
+  Color background_color = 3;
+  // The stroke size of the left border in pixels.
+  uint32 left_border_width = 4;
+  // The stroke size of the right border in pixels.
+  uint32 right_border_width = 5;
+  // The stroke size of the top border in pixels.
+  uint32 top_border_width = 6;
+  // The stroke size of the bottom border in pixels.
+  uint32 bottom_border_width = 7;
+}
+
+message Font {
+  // The character range that uses this font.
+  CharacterRange range = 1;
+  // The name of the font.
+  string name = 2;
+  // True if the font is a serif.
+  bool serif = 3;
+  // True if the font is monospaced.
+  bool monospace = 4;
+}
+
+message FontSize {
+  // The character range this attribute applies to.
+  CharacterRange range = 1;
+  // The size of the font in points. A typical point size is 11 or 12.
+  uint32 size = 2;
+}
+
+message FontStyle {
+  enum Style {
+    BOLD = 0;
+    ITALIC = 1;
+  }
+  // The character range this attribute applies to.
+  CharacterRange range = 1;
+  // The style of the text in this range.
+  Style style = 2;
+}
+
+message Color {
+  uint32 r = 1;
+  uint32 g = 2;
+  uint32 b = 3;
+}
+
+message BoundingBox {
+  // The top left coordinate of the bounding box. The top left of the
+  // page is considered to be 0,0.
+  uint32 x1 = 1;
+  uint32 y1 = 2;
+  // The bottom right coordinate of the bounding box.
+  uint32 x2 = 3;
+  uint32 y2 = 4;
+}
+
+message CharacterRange {
+  uint32 start = 1;
+  uint32 end = 2;
+}
+
+message Header {
+  CharacterRange range = 1;
+}
+
+message Footer {
+  CharacterRange range = 1;
+}
