@@ -6,7 +6,7 @@ ocr_page) from the `.hocr` content.
 
 # The ZuvaOCR File Format
 
-A `.zuvaocr` is a format that Zuva Document AI recognizes as "pre-OCR'd" content - in other words, Zuva Document AI will
+A `.zuvaocr` is a format that Zuva DocAI recognizes as "pre-OCR'd" content - in other words, Zuva DocAI will
 not run the document through the OCR engine if a `.zuvaocr` is provided.
 
 There are two main components of a `.zuvaocr` file:
@@ -51,7 +51,7 @@ converter.export('')  # The file path (including file name) of the resultant .zu
 ```
 
 This script can be used in conjunction with
-the [Zuva Document AI Python Wrapper](https://github.com/zuvaai/zdai-python) sample code,  
+the [Zuva DocAI Python Wrapper](https://github.com/zuvaai/zdai-python) sample code,  
 where you can take resultant `.zuvaocr` content and submit it to Zuva via `file.create`.
 
 # Licensing
