@@ -54,6 +54,20 @@ This script can be used in conjunction with
 the [Zuva DocAI Python Wrapper](https://github.com/zuvaai/zdai-python) sample code,
 where you can take resultant `.eocr` content and submit it to Zuva via `file.create`.
 
+# Troubleshooting
+
+On MacOS, if you encounter the error
+
+```
+bs4.FeatureNotFound: Couldn't find a tree builder with the features you requested: lxml. Do you need to install a parser library?
+```
+
+You may need to install `lxml`:
+
+```
+pip3 install lxml
+```
+
 # Licensing
 
 The code is licensed under the Apache License, Version 2.0. See LICENSE for the full license text.
