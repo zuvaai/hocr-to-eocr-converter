@@ -1,20 +1,20 @@
-# HOCR to ZuvaOCR Converter
+# HOCR to EOCR Converter
 
-This proof of concept converts `.hocr` to `.zuvaocr`.  
+This proof of concept converts `.hocr` to `.eocr`.
 Note that this converter only supports the words (ocrx_word), lines (ocr_line), paragraphs (ocr_par) and pages (
 ocr_page) from the `.hocr` content.
 
-# The ZuvaOCR File Format
+# The EOCR File Format
 
-A `.zuvaocr` is a format that Zuva DocAI recognizes as "pre-OCR'd" content - in other words, Zuva DocAI will
-not run the document through the OCR engine if a `.zuvaocr` is provided.
+A `.eocr` is a format that Zuva DocAI recognizes as "pre-OCR'd" content - in other words, Zuva DocAI will
+not run the document through the OCR engine if a `.eocr` is provided.
 
-There are two main components of a `.zuvaocr` file:
+There are two main components of a `.eocr` file:
 
 1. The header;
 2. The body (i.e. an instance of the `Document` message from `recognition_results_pb2.proto`)
 
-In order, the `.zuvaocr` contains the above components:
+In order, the `.eocr` contains the above components:
 
 1. The header;
 2. The sha1 digest of the body
@@ -23,7 +23,7 @@ In order, the `.zuvaocr` contains the above components:
 # Using recognition_results_pb2.proto
 
 This `.proto` contains the Protobuf messages. These messages can be used to create instance objects in your programming
-language of choice (for example, an instance of a ZuvaOCR `Character`)  
+language of choice (for example, an instance of a EOCR `Character`)
 To do this, you will need to use the `protoc` command compile the `.proto` for your programming language.
 
 The following can be used to create the Python classes which represent the `.proto` file, since this proof of concept
@@ -38,21 +38,21 @@ For convenience, a copy of `recognition_results_pb2.py` is provided in this repo
 
 # Usage
 
-The following is an example of how to use the `HOCRToZuvaOCRConverter` class:
+The following is an example of how to use the `HOCRToEOCRConverter` class:
 
 ```python
-from HOCRToZuvaOCRConverter import HOCRToZuvaOCRConverter
+from HOCRToEOCRConverter import HOCRToEOCRConverter
 
-converter = HOCRToZuvaOCRConverter()
+converter = HOCRToEOCRConverter()
 converter.hocr_folder = ''  # The folder that contains the list of .hocr for each page OCR'd out of the source file
 converter.set_document_md5(b'')  # The source file's md5 .digest()
 converter.start()
-converter.export('')  # The file path (including file name) of the resultant .zuvaocr
+converter.export('')  # The file path (including file name) of the resultant .eocr
 ```
 
 This script can be used in conjunction with
-the [Zuva DocAI Python Wrapper](https://github.com/zuvaai/zdai-python) sample code,  
-where you can take resultant `.zuvaocr` content and submit it to Zuva via `file.create`.
+the [Zuva DocAI Python Wrapper](https://github.com/zuvaai/zdai-python) sample code,
+where you can take resultant `.eocr` content and submit it to Zuva via `file.create`.
 
 # Licensing
 

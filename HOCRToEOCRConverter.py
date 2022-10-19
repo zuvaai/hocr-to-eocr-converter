@@ -17,14 +17,14 @@ import re
 from os import listdir
 from os.path import isfile, join
 
-import zuvaocr_helper
+import eocr_helper
 import hocr_helper
 from datetime import datetime
 
 
-class HOCRToZuvaOCRConverter(object):
+class HOCRToEOCRConverter(object):
     def __init__(self):
-        self.zuva_document = zuvaocr_helper.new_document()
+        self.zuva_document = eocr_helper.new_document()
         self.hocr_folder = None
 
     def consoleout(self, msg):
@@ -60,20 +60,20 @@ class HOCRToZuvaOCRConverter(object):
         """
         Adds the characters list to the converted output.
 
-        :param chars: An array of Zuva OCR characters
+        :param chars: An array of eOCR characters
         """
         self.zuva_document.characters.extend(chars)
 
     def add_document_page(self, range_start, page):
         """
-        Adds a new page to the Zuva OCR document
+        Adds a new page to the eOCR document
 
         :param range_start: The character index of where the page starts
         :param page: The page boundingbox
         """
         page_bbox = hocr_helper.get_boundingbox(page)
 
-        new_page = zuvaocr_helper.new_page(range_start = range_start,
+        new_page = eocr_helper.new_page(range_start = range_start,
                                            range_end = len(self.zuva_document.characters),
                                            width = page_bbox.get('right'),
                                            height = page_bbox.get('bottom'))
@@ -82,12 +82,12 @@ class HOCRToZuvaOCRConverter(object):
 
     def _add_character_space(self, current_bbox, next_bbox):
         """
-        Adds a new Zuva OCR character (space) on the same line as the previous character.
+        Adds a new eOCR character (space) on the same line as the previous character.
 
         :param current_bbox: The current boundingbox of the hocr word that was parsed.
         :param next_bbox: The next boundingbox of the hocr word that was just parsed.
         """
-        char = zuvaocr_helper.new_character(char = " ",
+        char = eocr_helper.new_character(char = " ",
                                             left_x1 = current_bbox.get('right'),
                                             top_y1 = current_bbox.get('top'),
                                             right_x2 = next_bbox.get('left'),
@@ -102,7 +102,7 @@ class HOCRToZuvaOCRConverter(object):
 
         :param bbox: The current boundingbox of the hocr word that was parsed.
         """
-        char = zuvaocr_helper.new_character(char = " ",
+        char = eocr_helper.new_character(char = " ",
                                             left_x1 = bbox.get('right'),
                                             top_y1 = bbox.get('top'),
                                             right_x2 = bbox.get('right'),
@@ -113,7 +113,7 @@ class HOCRToZuvaOCRConverter(object):
     def _add_paragraph_space(self, bbox):
         """
         Adds a new paragraph line using the current character's boundingbox.
-        The Zuva OCR character boundingbox values are set the same way as a line space. This
+        The eOCR character boundingbox values are set the same way as a line space. This
         function exists to make it easier to follow the flow in the self.start()
 
         :param bbox: The current boundingbox of the hocr word that was parsed.
@@ -122,10 +122,10 @@ class HOCRToZuvaOCRConverter(object):
 
     def _load_hocr_word_as_zuva_characters(self, hocr_word):
         """
-        Loads the hocr-word as Zuva OCR characters.
+        Loads the hocr-word as eOCR characters.
 
         :param hocr_word: The hocr "ocrx_word" entry
-        :return: Does not return anything. This loads the Zuva OCR characters array in the final results.
+        :return: Does not return anything. This loads the eOCR characters array in the final results.
         """
         zuva_chars = []
         chars = list(hocr_word.text)
@@ -145,7 +145,7 @@ class HOCRToZuvaOCRConverter(object):
             if i == len(chars) - 1:
                 right = bbox.get('right')
 
-            new_character = zuvaocr_helper.new_character(char = c,
+            new_character = eocr_helper.new_character(char = c,
                                                          left_x1 = left,
                                                          top_y1 = top,
                                                          right_x2 = right,
@@ -193,19 +193,19 @@ class HOCRToZuvaOCRConverter(object):
 
                 self.add_document_page(start, page)
 
-                self.consoleout(f'{hocr_filename} converted! (ZuvaOCR now contains {len(self.zuva_document.pages)} '
+                self.consoleout(f'{hocr_filename} converted! (EOCR now contains {len(self.zuva_document.pages)} '
                                 f'page(s) and {len(self.zuva_document.characters)} character(s))')
 
     def export(self, output_file):
-        content = zuvaocr_helper.get_zuvaocr_file_content(self.zuva_document)
+        content = eocr_helper.get_eocr_file_content(self.zuva_document)
 
         with open(output_file, "wb") as output:
             output.write(content)
 
-    def get_zuvaocr_characters_by_range(self, start, end):
+    def get_eocr_characters_by_range(self, start, end):
         return [c for c in self.zuva_document.characters[start:end]]
 
-    def get_zuvaocr_pages_by_character_range(self, start, end):
+    def get_eocr_pages_by_character_range(self, start, end):
         _page_start = None
         _page_end = _page_start
 
@@ -218,7 +218,7 @@ class HOCRToZuvaOCRConverter(object):
 
         return {'start':_page_start, 'end':_page_end}
 
-    def get_zuvaocr_page_by_character_position(self, position):
+    def get_eocr_page_by_character_position(self, position):
         _pg_number = None
 
         for pg_number, page in enumerate(self.zuva_document.pages, 0):
