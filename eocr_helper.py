@@ -103,7 +103,9 @@ def get_eocr_file_content(zuva_document: Document) -> bytes:
     """
     content = b''
     content += eocr_header
-    body = gzip.compress(zuva_document.SerializeToString())
+
+    # Use mtime=0 to set the timestamp, so that the eOCR file is generated deterministically
+    body = gzip.compress(zuva_document.SerializeToString(), mtime=0)
     content += hashlib.sha1(body).digest()
     content += body
     return content
