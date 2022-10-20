@@ -17,8 +17,8 @@ from recognition_results_pb2 import BoundingBox, Character, Document, CharacterR
 import hashlib
 import gzip
 
-# The header to be added to the compiled byte-content of the ZuvaOCR file
-zuvaocr_header = b'kiraocr  \n'
+# The header to be added to the compiled byte-content of the EOCR file
+eocr_header = b'eocr     \n'
 
 # The version of the protobuf schema used
 proto_version = 3
@@ -30,16 +30,16 @@ page_dpi_y = 300
 
 def new_document(version: int = proto_version) -> Document:
     """
-    Creates a new Zuva OCR Document
+    Creates a new eOCR Document
 
-    :return: ZuvaOCR Document
+    :return: eOCR Document
     """
     return Document(version = version)
 
 
 def new_character(char, left_x1, top_y1, right_x2, bottom_y2, confidence: int) -> Character:
     """
-    Creates a new ZuvaOCR Character with bounding boxes and confidence
+    Creates a new eOCR Character with bounding boxes and confidence
 
     :param char: The character to be added
     :param left_x1: The x1 pixel location
@@ -47,7 +47,7 @@ def new_character(char, left_x1, top_y1, right_x2, bottom_y2, confidence: int) -
     :param right_x2: The x2 pixel location
     :param bottom_y2: The y2 pixel location
     :param confidence: The confidence
-    :return: ZuvaOCR Character
+    :return: EOCR Character
     """
     bb = BoundingBox()
     bb.x1 = left_x1
@@ -64,11 +64,11 @@ def new_character(char, left_x1, top_y1, right_x2, bottom_y2, confidence: int) -
 
 def new_page_range(start, end) -> CharacterRange:
     """
-    Creates a new ZuvaOCR Page CharacterRange
+    Creates a new eOCR Page CharacterRange
 
     :param start: The character position of the page's first character
     :param end: The character position of the page's last character
-    :return: ZuvaOCR CharacterRange
+    :return: EOCR CharacterRange
     """
     return CharacterRange(start = start,
                           end = end)
@@ -76,7 +76,7 @@ def new_page_range(start, end) -> CharacterRange:
 
 def new_page(range_start, range_end, width, height, dpi_x: int = page_dpi_x, dpi_y: int = page_dpi_y) -> Page:
     """
-    Creates a new ZuvaOCR Page
+    Creates a new eOCR Page
 
     :param start: The character position of the page's first character
     :param end: The character position of the page's last character
@@ -84,7 +84,7 @@ def new_page(range_start, range_end, width, height, dpi_x: int = page_dpi_x, dpi
     :param height: The page's bottom (y2) pixel position
     :param dpi_x: The page's X DPI
     :param dpi_y: The page's Y DPI
-    :return: ZuvaOCR Page
+    :return: EOCR Page
     """
     page_range = new_page_range(start = range_start, end = range_end)
     page = Page(range = page_range,
@@ -95,15 +95,17 @@ def new_page(range_start, range_end, width, height, dpi_x: int = page_dpi_x, dpi
     return page
 
 
-def get_zuvaocr_file_content(zuva_document: Document) -> bytes:
+def get_eocr_file_content(zuva_document: Document) -> bytes:
     """
-    Creates the compiled ZuvaOCR content using the ZuvaOCR Document.
+    Creates the compiled EOCR content using the eOCR Document.
 
-    :return: The byte-content of the ZuvaOCR file
+    :return: The byte-content of the eOCR file
     """
     content = b''
-    content += zuvaocr_header
-    body = gzip.compress(zuva_document.SerializeToString())
+    content += eocr_header
+
+    # Use mtime=0 to set the timestamp, so that the eOCR file is generated deterministically
+    body = gzip.compress(zuva_document.SerializeToString(), mtime=0)
     content += hashlib.sha1(body).digest()
     content += body
     return content

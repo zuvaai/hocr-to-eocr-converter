@@ -18,7 +18,7 @@
 
 
 import hashlib
-from HOCRToZuvaOCRConverter import HOCRToZuvaOCRConverter
+from HOCRToEOCRConverter import HOCRToEOCRConverter
 from zdai import ZDAISDK, Language, Classification, Extraction
 from datetime import datetime
 import time
@@ -27,7 +27,7 @@ from colorama import Fore
 
 
 hocr_folder = 'out/CANADAGOOS-F1Securiti-2152017/'
-zuva_ocr_file = 'CANADAGOOS-F1Securiti-2152017.zuvaocr'
+eocr_file = 'CANADAGOOS-F1Securiti-2152017.eocr'
 source_file = 'CANADAGOOS-F1Securiti-2152017.PDF'
 
 
@@ -35,10 +35,10 @@ def consoleout(msg):
     print(f'[{datetime.now()}] {msg}')
 
 
-def delete_zuvaocr():
+def delete_eocr():
     try:
-        os.remove(zuva_ocr_file)
-        print(f'Deleted {zuva_ocr_file}')
+        os.remove(eocr_file)
+        print(f'Deleted {eocr_file}')
     except OSError:
         pass
 
@@ -50,17 +50,17 @@ def get_source_file_md5():
     return hash
 
 
-delete_zuvaocr()
+delete_eocr()
 
-converter = HOCRToZuvaOCRConverter()
+converter = HOCRToEOCRConverter()
 converter.hocr_folder = hocr_folder
 md5 = get_source_file_md5()
 converter.set_document_md5(md5.digest())
 
 consoleout(f'Starting conversion')
 converter.start()
-converter.export(zuva_ocr_file)
-consoleout(f'Conversion done and saved to {zuva_ocr_file}')
+converter.export(eocr_file)
+consoleout(f'Conversion done and saved to {eocr_file}')
 
 # Everything below is dependent on the ZDAI Python Wrapper
 field_names_to_extract = ['Title', 'Parties', 'Date', 'Governing Law', 'Indemnity']
@@ -71,9 +71,9 @@ field_ids = [f.id for f in fields if f.name in field_names_to_extract]
 consoleout(f'Obtained field_ids for extraction: {", ".join(field_names_to_extract)}')
 
 # Uncomment the below !
-with open(zuva_ocr_file, 'rb') as zuvaocr:
-    file, _ = sdk.file.create(content = zuvaocr.read(), is_zuva_ocr = True)
-    consoleout(f'Submitted {zuva_ocr_file} as {file.id}. It expires on {file.expiration}.')
+with open(eocr_file, 'rb') as eocr:
+    file, _ = sdk.file.create(content = eocr.read(), is_eocr = True)
+    consoleout(f'Submitted {eocr_file} as {file.id}. It expires on {file.expiration}.')
 
 jobs = []
 
@@ -137,13 +137,13 @@ while len(jobs)>0:
                         print(f'{field_name}: {field_extraction.text}')
 
                         for span in field_extraction.spans:
-                            zuva_characters = converter.get_zuvaocr_characters_by_range(start = span.get('start'),
+                            zuva_characters = converter.get_eocr_characters_by_range(start = span.get('start'),
                                                                                         end = span.get('end'))
 
                             # Go through the range of this span to grab the Zuva Characters
                             for i in range(span.get('start'), span.get('end')):
                                 zuva_character = converter.zuva_document.characters[i]
-                                zuva_page = converter.get_zuvaocr_page_by_character_position(i) + 1  # 0-based indices
+                                zuva_page = converter.get_eocr_page_by_character_position(i) + 1  # 0-based indices
                                 print(f'   [Field \"{field_name}\"] '
                                       f'[Page: {zuva_page}] '
                                       f'[Character: \"{chr(zuva_character.unicode)}\"] '
